@@ -8,12 +8,11 @@ const octokit = new Octokit({
   auth: process.env.OCTOKIT_TOKEN,
 });
 
-export async function GET() {
-  let msgResponse = "";
-  let statusResponse = 200;
+async function getSHA() {
+  let result = "";
 
   try {
-    const result = await octokit.request(
+    const { data } = await octokit.request(
       "GET /repos/{owner}/{repo}/contents/{path}",
       {
         owner: "devanada",
@@ -24,16 +23,16 @@ export async function GET() {
         },
       }
     );
-    msgResponse = JSON.stringify(result);
+    result = (data as any).sha;
   } catch (error: any) {
-    msgResponse = error.response.data.message;
-    statusResponse = error.status;
+    result = "";
+    console.log(error);
   }
 
-  return NextResponse.json({ message: msgResponse });
+  return result;
 }
 
-export async function POST() {
+export async function GET() {
   const newValue = Json.count + 1;
   const newContent = {
     count: newValue,
@@ -43,18 +42,20 @@ export async function POST() {
   let msgResponse = "";
   let statusResponse = 200;
 
+  const shaFile = await getSHA();
+
   try {
     await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
       owner: "devanada",
       repo: "cron-with-nextjs",
       path: "src/app/api/data.json",
-      message: `feat: push test ${newValue}`,
+      message: `feat: initiate cron job #${newValue}`,
       committer: {
         name: process.env.GITHUB_NAME as string,
         email: process.env.GITHUB_EMAIL as string,
       },
       content: encodedContent,
-      sha: "633d47a56cd1ec921fc243c6f88b1593331bc22f",
+      sha: shaFile,
       headers: {
         "X-GitHub-Api-Version": "2022-11-28",
       },
