@@ -20,7 +20,6 @@ async function getSHA() {
         path: "src/app/api/data.json",
         headers: {
           "X-GitHub-Api-Version": "2022-11-28",
-          authorization: `Bearer ${process.env.OCTOKIT_TOKEN}`,
         },
       }
     );
