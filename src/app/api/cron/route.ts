@@ -5,7 +5,7 @@ import nextBase64 from "next-base64";
 import Json from "../data.json";
 
 const octokit = new Octokit({
-  auth: process.env.OCTOKIT_TOKEN,
+  // auth: process.env.OCTOKIT_TOKEN,
 });
 
 async function getSHA() {
@@ -20,6 +20,7 @@ async function getSHA() {
         path: "src/app/api/data.json",
         headers: {
           "X-GitHub-Api-Version": "2022-11-28",
+          authorization: `Bearer ${process.env.OCTOKIT_TOKEN}`,
         },
       }
     );
@@ -58,6 +59,7 @@ export async function GET() {
       sha: shaFile,
       headers: {
         "X-GitHub-Api-Version": "2022-11-28",
+        authorization: `Bearer ${process.env.OCTOKIT_TOKEN}`,
       },
     });
     msgResponse = "Cron job is successed";
