@@ -12,8 +12,8 @@ async function getContent() {
       path: "data.json",
       headers: {
         accept: "application/vnd.github+json",
-        "Cache-Control": "no-store",
-        "If-Modified-Since": new Date().toISOString(),
+        Expires: -1,
+        "Cache-Control": "must-revalidate",
       },
     }
   );

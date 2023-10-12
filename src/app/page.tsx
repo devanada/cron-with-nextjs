@@ -2,6 +2,8 @@ import nextBase64 from "next-base64";
 
 import { octokit } from "@/utils/config";
 
+export const revalidate = 1;
+
 async function getData() {
   try {
     const { data } = await octokit.request(
@@ -12,8 +14,8 @@ async function getData() {
         path: "data.json",
         headers: {
           accept: "application/vnd.github+json",
-          "Cache-Control": "no-store",
-          "If-Modified-Since": new Date().toISOString(),
+          Expires: -1,
+          "Cache-Control": "must-revalidate",
         },
       }
     );
