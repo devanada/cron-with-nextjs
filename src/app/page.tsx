@@ -1,6 +1,34 @@
-import Json from "@/app/api/data.json";
+import nextBase64 from "next-base64";
 
-export default function Home() {
+import { octokit } from "@/utils/config";
+
+async function getData() {
+  try {
+    const { data } = await octokit.request(
+      "GET /repos/{owner}/{repo}/contents/{path}",
+      {
+        owner: "devanada",
+        repo: "warehouse",
+        path: "data.json",
+        headers: {
+          accept: "application/vnd.github+json",
+          "Cache-Control": "no-store",
+          "If-Modified-Since": new Date().toISOString(),
+        },
+      }
+    );
+
+    const temp = nextBase64.decode((data as any).content);
+
+    return JSON.parse(temp);
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+}
+
+export default async function Home() {
+  const data = await getData();
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
@@ -9,7 +37,7 @@ export default function Home() {
 
       <div className="relative flex flex-col place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1] gap-4">
         <h1 className="text-4xl font-semibold">Cron job has run</h1>
-        <p className="text-9xl font-bold">{Json.count}</p>
+        <p className="text-9xl font-bold">{data.count}</p>
         <p className="text-xl font-semibold tracking-widest">times</p>
       </div>
 
